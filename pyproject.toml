@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "entreprenapp"
+version = "0.1.0"
+description = "A small app that help entrepreneur to manage they they work."
+authors = ["Mickaël  Anicette <mickaelanicette@gmail.com>"]
+license = "MIT License"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+Django = "^4.1.1"
+
+[tool.poetry.group.dev.dependencies]
+flake8 = "^5.0.4"
+black = "^22.8.0"
+coverage = "^6.4.4"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
