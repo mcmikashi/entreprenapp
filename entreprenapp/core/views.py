@@ -1,9 +1,9 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.views.generic.detail import DetailView
-from django.views.generic.list import ListView
+from django.http import Http404, HttpResponseRedirect
 from django.utils import timezone
-from django.http import HttpResponseRedirect, Http404
+from django.views.generic.detail import DetailView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.views.generic.list import ListView
 
 
 class CoreCreateView(LoginRequiredMixin, CreateView):

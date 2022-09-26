@@ -1,13 +1,9 @@
-from django.urls import path
-from .views import (
-    CustomLoginView,
-    CustomPasswordResetView,
-    CustomPasswordResetConfirmView,
-    CustomPasswordResetDoneView,
-    CustomPasswordResetCompleteView,
-)
-
 from django.contrib.auth.views import logout_then_login
+from django.urls import path
+
+from .views import (CustomLoginView, CustomPasswordResetCompleteView,
+                    CustomPasswordResetConfirmView,
+                    CustomPasswordResetDoneView, CustomPasswordResetView)
 
 app_name = "users"
 

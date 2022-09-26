@@ -1,9 +1,11 @@
+from datetime import date, datetime, timezone
+from unittest import mock
+
+from dateutil.relativedelta import relativedelta
 from django.contrib.auth import get_user_model
 from django.test import TestCase
-from .models import Saler, Customer, Item, OrderLine, Estimate, Invoice
-from unittest import mock
-from datetime import datetime, timezone, date
-from dateutil.relativedelta import relativedelta
+
+from .models import Customer, Estimate, Invoice, Item, OrderLine, Saler
 
 
 class SalerTests(TestCase):

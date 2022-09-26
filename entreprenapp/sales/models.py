@@ -1,10 +1,12 @@
-from django.db import models
-from django.utils.translation import gettext_lazy as _
-from phonenumber_field.modelfields import PhoneNumberField
-from django_countries.fields import CountryField
-from core.models import Core
 from decimal import Decimal
+
+from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
+from django_countries.fields import CountryField
+from phonenumber_field.modelfields import PhoneNumberField
+
+from core.models import Core
 
 
 class SalesActorBase(Core):
