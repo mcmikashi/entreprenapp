@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_countries",
+    "crispy_forms",
+    "crispy_bootstrap5",
     "users",
     "core",
     "sales",
@@ -133,6 +135,16 @@ MEDIA_ROOT = PurePath(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+#Default login page
+LOGIN_URL = "users:login"
 
 # Setting default user model
 AUTH_USER_MODEL = 'users.CustomUser'
+
+# CRISPY CONFIG
+CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
+
+CRISPY_TEMPLATE_PACK = "bootstrap5"
+
+# Email setting
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
