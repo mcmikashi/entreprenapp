@@ -1,0 +1,56 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+    integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <title>Entreprenapp</title>
+</head>
+
+<body>
+  {% block header %}
+    <header>
+      <nav class="nav bg-light p-2">
+        <a data-bs-toggle="offcanvas" data-bs-target="#sidebarOffcanvas" aria-controls="sidebarOffcanvas">
+          <i class="fa-solid fa-bars"></i>
+        </a>
+      </nav>
+    </header>
+  {% endblock header %}
+  {% block sidebar %}
+    <div class="offcanvas offcanvas-start w-25" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1"
+      id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
+      <div class="offcanvas-header">
+        <h5 class="offcanvas-title" id="sidebarOffcanvasLabel">Menu</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+      </div>
+      <div class="offcanvas-body">
+        <nav class="nav flex-column m-2 p-2" id="sidebar">
+          <a class="nav-link text-capitalize" href="#"><i class="fa-solid fa-building"></i> saler</a>
+          <a class="nav-link text-capitalize" href="#"><i class="fa-solid fa-user-group"></i> customer</a>
+          <a class="nav-link text-capitalize" href="#"><i class="fa-solid fa-dolly"></i> item</a>
+          <a class="nav-link text-capitalize" href="#"><i class="fa-regular fa-file-lines"></i> estimate</a>
+          <a class="nav-link text-capitalize" href="#"><i class="fa-solid fa-file-invoice"></i> invoice</a>
+        </nav>
+      </div>
+    </div>
+  {% endblock sidebar %}
+
+  <main class="min-vh-100 container-fluid bg-secondary bg-opacity-10">
+    {% block content %}
+    {% endblock content %}
+  </main>
+  {% block footer %}
+    <footer class="bg-secondary">
+      <p class="mb-0 text-white text-center">Copyright - 2022 - Mcmikashi</p>
+    </footer>
+  {% endblock footer %}
+  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+</body>
+</html>
