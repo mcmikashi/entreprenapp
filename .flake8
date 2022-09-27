@@ -9,4 +9,4 @@ exclude =
     .venv,
     env,
     .env,
-    migrations/*.py,
+    */migrations/*,
