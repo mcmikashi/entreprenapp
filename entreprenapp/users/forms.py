@@ -1,11 +1,19 @@
 from crispy_bootstrap5.bootstrap5 import FloatingField
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import HTML, Div, Layout, Submit
-from django.contrib.auth.forms import (AuthenticationForm, PasswordResetForm,
-                                       SetPasswordForm, UserChangeForm,
-                                       UserCreationForm)
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    PasswordResetForm,
+    SetPasswordForm,
+    UserChangeForm,
+    UserCreationForm,
+)
 
 from .models import CustomUser
+
+DEFAULT_USERS_CLASS = (
+    "col-10 col-md-4 p-4 mx-auto border border-3 border-primary rounded-4"
+)
 
 
 class CustomUserCreationForm(UserCreationForm):
@@ -22,29 +30,28 @@ class CustomUserChangeForm(UserChangeForm):
 
 class CustomAuthenticationForm(AuthenticationForm):
     def __init__(self, *args, **kwargs):
-        super(CustomAuthenticationForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = "post"
-        self.helper.form_class = \
-            "col-10 col-md-4 p-4 mx-auto rounded-4 border border-3 border-primary"
+        self.helper.form_class = DEFAULT_USERS_CLASS
         self.helper.layout = Layout(
             HTML('<h4 class="mb-4">Login</h4>'),
             FloatingField("username"),
             FloatingField("password"),
             Div(Submit("submit", "Submit"), css_class="d-grid m-3"),
             HTML(
-                "<a href='{% url 'users:password_reset' %}'>Forgot your password ?</a>"
+                "<a href='{% url 'users:password_reset' %}'>"
+                "Forgot your password ?</a>"
             ),
         )
 
 
 class CustomPasswordResetForm(PasswordResetForm):
     def __init__(self, *args, **kwargs):
-        super(CustomPasswordResetForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = "post"
-        self.helper.form_class = \
-            "col-10 col-md-4 p-4 mx-auto rounded-4 border border-3 border-primary"
+        self.helper.form_class = DEFAULT_USERS_CLASS
         self.helper.layout = Layout(
             FloatingField("email"),
             Div(Submit("submit", "Submit"), css_class="d-grid m-2"),
@@ -53,11 +60,10 @@ class CustomPasswordResetForm(PasswordResetForm):
 
 class CustomSetPasswordForm(SetPasswordForm):
     def __init__(self, *args, **kwargs):
-        super(CustomSetPasswordForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.form_method = "post"
-        self.helper.form_class = \
-            "col-10 col-md-4 p-4 mx-auto rounded-4 border border-3 border-primary"
+        self.helper.form_class = DEFAULT_USERS_CLASS
         self.helper.layout = Layout(
             FloatingField("new_password1"),
             FloatingField("new_password2"),

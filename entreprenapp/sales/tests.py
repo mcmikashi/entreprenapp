@@ -120,7 +120,7 @@ class OrderLineTest(TestCase):
     def setUp(self):
         self.item = Item.objects.create(
             label="HP Laptop 15s-fq2007sf",
-            description="PC Portable 15.6' FHD (AMZ Ryzen 5, RAM 8 Go, SSD 256 Go)",
+            description="PC 15.6' FHD (AMZ Ryzen 5, RAM 8 Go, SSD 256 Go)",
             price_duty_free=1000,
             tax=15,
         )
@@ -179,13 +179,13 @@ class EstimateTest(TestCase):
         )
         self.item_0 = Item.objects.create(
             label="MSI titan gt77",
-            description="PC Portable 17' FHD (Intel Core i9, RAM 32 Go, SSD 2 To)",
+            description="PC 17' FHD (Intel Core i9, RAM 32 Go, SSD 2 To)",
             price_duty_free=4000,
             tax=5,
         )
         self.item_1 = Item.objects.create(
             label="Microsoft Surface Book",
-            description="PC Portable 15' FHD (Intel Core i7, RAM 32 Go, SSD 512 Go)",
+            description="PC 15' FHD (Intel Core i7, RAM 32 Go, SSD 512 Go)",
             price_duty_free=3800,
             tax=15,
         )
@@ -199,7 +199,9 @@ class EstimateTest(TestCase):
         )
 
     def test_create_estimate(self):
-        """Create an estimate instance and check the properties data and methods"""
+        """Create an estimate instance and
+        check the properties data and methods
+        """
         default_date = date.today() + relativedelta(days=30)
         estimate_data = {
             "saler": self.saler,
@@ -240,7 +242,8 @@ class EstimateTest(TestCase):
         )
         self.assertEqual(
             str(estimate),
-            f"{estimate_data['saler']} - {estimate_data['customer']} - {estimate_data['date']}",
+            f"{estimate_data['saler']} - {estimate_data['customer']}"
+            f" - {estimate_data['date']}",
         )
         # check len number of invoice
         before_invoices = Invoice.objects.all()
@@ -337,5 +340,6 @@ class InvoiceTest(TestCase):
         )
         self.assertEqual(
             str(invoice),
-            f"{invoice_data['saler']} - {invoice_data['customer']} - {invoice_data['date']}",
+            f"{invoice_data['saler']} - {invoice_data['customer']} - "
+            f"{invoice_data['date']}",
         )
