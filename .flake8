@@ -10,3 +10,4 @@ exclude =
     env,
     .env,
     */migrations/*,
+    settings.py
