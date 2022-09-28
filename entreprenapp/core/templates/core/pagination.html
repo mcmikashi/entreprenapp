@@ -1,0 +1,35 @@
+<section class="pagination d-flex justify-content-center">
+    <nav aria-label="item navigation">
+        <ul class="pagination">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1">&laquo; first</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}">previous</a>
+                </li>
+            {% endif %}
+            {% for number in elied_page_range %}
+                {% if number in paginator.page_range %}
+                    {% if number == page_obj.number %}
+                        <li class="page-item active" aria-current="page">
+                            <a href="#" class="page-link">{{ number }}</a>
+                        </li>
+                    {% else %}
+                        <li class="page-item">
+                            <a href="?page={{ number}}" class="page-link">{{ number }}</a>
+                        </li>
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}">next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+</section>
