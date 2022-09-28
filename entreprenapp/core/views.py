@@ -41,6 +41,16 @@ class CoreListView(LoginRequiredMixin, ListView):
     """A custom list view that show instance to user admin
     and only show instance that is active for other user."""
 
+    paginate_by = 15
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        elided_page_range = context["paginator"].get_elided_page_range(
+            number=context["page_obj"].number, on_each_side=4, on_ends=0
+        )
+        context["elied_page_range"] = elided_page_range
+        return context
+
     def get_queryset(self):
         query_set = super().get_queryset()
         if self.request.user.is_superuser:
