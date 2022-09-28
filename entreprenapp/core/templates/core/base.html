@@ -41,8 +41,18 @@
       </div>
     </div>
   {% endblock sidebar %}
-
   <main class="min-vh-100 container-fluid bg-secondary bg-opacity-10">
+    {% if messages %}
+      <section id="section_message row">
+          {% for message in messages %}
+          <div class="alert {% if message.tags %} alert-{{ message.tags }}{% else %} alert-primary {% endif %}
+                      alert-dismissible fade show col-8 col-md-6 mx-auto" role="alert">
+            {{message}}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+          {% endfor %}
+      </section>
+    {% endif %}
     {% block content %}
     {% endblock content %}
   </main>
