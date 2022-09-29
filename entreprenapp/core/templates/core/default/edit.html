@@ -2,8 +2,5 @@
 {% load i18n %}
 {% load genecric_name %}
 {% block form_type %}
-    Edit
-    {% blocktranslate with model_name=object|get_class_name|lower %}
-        {{ model_name }}
-    {% endblocktranslate %}
+    Edit {{ model_name }}
 {% endblock form_type %}

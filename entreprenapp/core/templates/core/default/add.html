@@ -1,14 +1,10 @@
 {% extends 'core/base.html' %}
 {% load crispy_forms_tags %}
 {% load i18n %}
-{% load genecric_name %}
 {% block content %}
 <h1 class="text-center mb-2">
     {% block form_type %}
-        Add
-        {% blocktranslate with model_name=object|get_class_name|lower %}
-            '{{ model_name }}'
-        {% endblocktranslate %}
+        Add {{ model_name }}
     {% endblock form_type %}
 </h1>
 <div class="row my-4">
