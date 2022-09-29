@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, HttpResponseRedirect
 from django.utils import timezone
@@ -6,7 +7,14 @@ from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
 
-class CoreCreateView(LoginRequiredMixin, CreateView):
+class CustomContextDataMixin:
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["model_name"] = self.model.__name__.lower()
+        return context
+
+
+class CoreCreateView(LoginRequiredMixin, CustomContextDataMixin, CreateView):
     """Custom create view that set the  created by
     property when user create a new instance"""
 
@@ -15,7 +23,7 @@ class CoreCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
 
-class CoreUpdateView(LoginRequiredMixin, UpdateView):
+class CoreUpdateView(LoginRequiredMixin, CustomContextDataMixin, UpdateView):
     """A custom update view that set the  created by
     property when user update an instance"""
 
@@ -24,7 +32,7 @@ class CoreUpdateView(LoginRequiredMixin, UpdateView):
         return super().form_valid(form)
 
 
-class CoreDeleteView(LoginRequiredMixin, DeleteView):
+class CoreDeleteView(LoginRequiredMixin, CustomContextDataMixin, DeleteView):
     """A custom delete view that soft delete an instance"""
 
     def post(self, request, *args, **kwargs):
@@ -34,6 +42,7 @@ class CoreDeleteView(LoginRequiredMixin, DeleteView):
         self.object.deleted_by = self.request.user
         self.object.save()
         success_url = self.get_success_url()
+        messages.success(request, "Deleted successfully")
         return HttpResponseRedirect(success_url)
 
 
