@@ -1,19 +1,18 @@
 from decimal import Decimal
 
+from core.models import Core
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
 from phonenumber_field.modelfields import PhoneNumberField
 
-from core.models import Core
-
 
 class SalesActorBase(Core):
     name = models.CharField(_("name"), max_length=200)
     adress = models.CharField(_("adress"), max_length=254)
     city = models.CharField(_("city"), max_length=100)
-    postal_code = models.CharField(_("postal_code"), max_length=5)
+    postal_code = models.CharField(_("postal_code"), max_length=15)
     country = CountryField(blank=True)
     email = models.EmailField(_("email address"), max_length=254, blank=True)
     phone_number = PhoneNumberField(blank=True)
@@ -23,6 +22,7 @@ class SalesActorBase(Core):
 
     class Meta:
         abstract = True
+        ordering = ["name"]
 
 
 class Saler(SalesActorBase):
@@ -35,14 +35,20 @@ class Saler(SalesActorBase):
         blank=True,
         null=True,
     )
+    estimate_number = models.IntegerField(
+        ("estimate number"), default=0, editable=False
+    )
+    invoice_number = models.IntegerField(
+        ("invoice number"), default=0, editable=False
+    )
 
-    class Meta:
+    class Meta(SalesActorBase.Meta):
         verbose_name = _("Saler")
         verbose_name_plural = _("Salers")
 
 
 class Customer(SalesActorBase):
-    class Meta:
+    class Meta(SalesActorBase.Meta):
         verbose_name = _("Customer")
         verbose_name_plural = _("Customers")
 
@@ -69,6 +75,7 @@ class Item(Core):
         return self.label
 
     class Meta:
+        ordering = ["label"]
         verbose_name = _("Item")
         verbose_name_plural = _("Items")
 
@@ -149,9 +156,13 @@ class SalesActionBase(Core):
 
     class Meta:
         abstract = True
+        ordering = ["modified_date", "id"]
 
 
 class Estimate(SalesActionBase):
+    estimate_saler_number = models.IntegerField(
+        _("invoice saler number"), editable=False
+    )
     validity_date = models.DateField(_("validity date"))
 
     def turn_into_an_invoice(self):
@@ -167,6 +178,29 @@ class Estimate(SalesActionBase):
         new_invoice.save()
         return True
 
+    def save(self, *args, **kwargs):
+        if not self.estimate_saler_number:
+            self.estimate_saler_number = self.saler.estimate_number + 1
+            self.saler.estimate_number += 1
+            self.saler.save()
+        super().save(*args, **kwargs)
+
+    class Meta(SalesActionBase.Meta):
+        pass
+
 
 class Invoice(SalesActionBase):
+    invoice_saler_number = models.IntegerField(
+        _("invoice saler number"), editable=False
+    )
     is_paid = models.BooleanField(_("is paid"))
+
+    def save(self, *args, **kwargs):
+        if not self.invoice_saler_number:
+            self.invoice_saler_number = self.saler.invoice_number + 1
+            self.saler.invoice_number += 1
+            self.saler.save()
+        super().save(*args, **kwargs)
+
+    class Meta(SalesActionBase.Meta):
+        pass
