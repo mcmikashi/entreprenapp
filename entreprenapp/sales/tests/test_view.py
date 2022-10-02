@@ -2,7 +2,7 @@ from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from ..models import Customer, Saler
+from ..models import Customer, Item, Saler
 
 
 class SalerViewsTestCase(TestCase):
@@ -412,3 +412,199 @@ class CustomerViewsTestCase(TestCase):
         self.assertFalse(deleted_customer.is_active)
         self.assertIsNotNone(deleted_customer.deleted_date)
         self.assertEqual(deleted_customer.deleted_by, self.user)
+
+
+class ItemViewsTestCase(TestCase):
+    def setUp(self):
+        self.UserModel = get_user_model()
+        self.user = self.UserModel.objects.create_user(
+            email="user@test.com", password="password123"
+        )
+        self.admin = self.UserModel.objects.create_superuser(
+            email="admin@test.com",
+            password="strongpass123",
+        )
+        self.item_0 = Item.objects.create(
+            label="Book : The Summer HouseThe Summer House",
+            description="by James Patterson and Brendan DuBois",
+            price_duty_free=12.55,
+            tax=5.5,
+        )
+        self.item_1 = Item.objects.create(
+            label="Book : Snap",
+            description="by Belinda Bauer",
+            price_duty_free=13.99,
+            tax=7.5,
+            is_active=False,
+        )
+        self.default_client = Client()
+        self.default_client.login(
+            username=self.user.email, password="password123"
+        )
+        self.admin_client = Client()
+        self.admin_client.login(
+            username=self.admin.email, password="strongpass123"
+        )
+
+    def test_list_view(self):
+        """Check if all users get corresponding response"""
+
+        # Anonymous user get redirect to the login
+        response_anonymous = self.client.get(
+            reverse("sales:item_create"), follow=False
+        )
+        self.assertEqual(response_anonymous.status_code, 302)
+        self.assertIn(reverse("users:login"), response_anonymous.url)
+
+        # Authenticated user only see object when  is_active == True
+        response_user = self.default_client.get(reverse("sales:item_list"))
+        self.assertEqual(response_user.status_code, 200)
+        self.assertEqual(len(response_user.context["object_list"]), 1)
+        self.assertContains(
+            response_user, b"Book : The Summer HouseThe Summer House"
+        )
+        self.assertContains(response_user, b"12.55")
+        self.assertContains(response_user, b"5.5")
+        self.assertNotContains(response_user, b"Book : Snap")
+        self.assertNotContains(response_user, b"13.99")
+        self.assertNotContains(response_user, b"7.5")
+
+        # Admin SHOULD see all object
+        reponse_admin = self.admin_client.get(reverse("sales:item_list"))
+        self.assertEqual(reponse_admin.status_code, 200)
+        self.assertEqual(len(reponse_admin.context["object_list"]), 2)
+        self.assertContains(
+            reponse_admin, b"Book : The Summer HouseThe Summer House"
+        )
+        self.assertContains(reponse_admin, b"12.55")
+        self.assertContains(reponse_admin, b"5.5")
+        self.assertContains(reponse_admin, b"Book : Snap")
+        self.assertContains(reponse_admin, b"13.99")
+        self.assertContains(reponse_admin, b"7.5")
+
+    def test_create_view(self):
+        """Check if all users get corresponding response"""
+
+        # Anonymous user get redirect to the login
+        response_anonymous = self.client.get(
+            reverse("sales:item_create"), follow=False
+        )
+        self.assertEqual(response_anonymous.status_code, 302)
+        self.assertIn(reverse("users:login"), response_anonymous.url)
+
+        # Authenticated user can see the create page
+        response_user_get = self.default_client.get(
+            reverse("sales:item_create")
+        )
+        self.assertEqual(response_user_get.status_code, 200)
+        self.assertContains(response_user_get, b"Add item")
+
+        # Authenticated user can create a item
+        new_item_data = {
+            "label": "Book : Scar Tissue",
+            "description": "by  Anthony Kiedis",
+            "price_duty_free": 50,
+            "tax": 5,
+        }
+        items = Item.objects.all()
+        self.assertEqual(len(items), 2)
+        response_user_post_0 = self.default_client.post(
+            reverse("sales:item_create"),
+            new_item_data,
+            follow=True,
+        )
+        self.assertEqual(response_user_post_0.status_code, 200)
+        messages = list(response_user_post_0.context["messages"])
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            str(messages[0]),
+            f"{new_item_data['label']} was created successfully",
+        )
+        items = Item.objects.all()
+        self.assertEqual(len(items), 3)
+        self.assertRedirects(response_user_post_0, reverse("sales:item_list"))
+        self.assertContains(
+            response_user_post_0, bytes(new_item_data["label"], "utf8")
+        )
+
+    def test_update_view(self):
+        """Check if all users get corresponding response"""
+
+        # Anonymous user get redirect to the login
+        response_anonymous = self.client.get(
+            reverse("sales:item_update", kwargs={"pk": self.item_0.id}),
+            follow=False,
+        )
+        self.assertEqual(response_anonymous.status_code, 302)
+        self.assertIn(reverse("users:login"), response_anonymous.url)
+
+        # Authenticated user can see the update page
+        response_user_get = self.default_client.get(
+            reverse("sales:item_update", kwargs={"pk": self.item_0.id})
+        )
+        self.assertEqual(response_user_get.status_code, 200)
+        self.assertEqual(response_user_get.context["object"], self.item_0)
+        self.assertContains(response_user_get, b"Edit item")
+
+        # Authenticated user can update a item instance
+        updated_item_data = {
+            "label": "Book : The Summer HouseThe Summer House",
+            "description": "by James Patterson and Brendan DuBois",
+            "price_duty_free": 150,
+            "tax": 30,
+        }
+        response_user_post_0 = self.default_client.post(
+            reverse("sales:item_update", kwargs={"pk": self.item_0.id}),
+            updated_item_data,
+            follow=True,
+        )
+        self.assertEqual(response_user_post_0.status_code, 200)
+        messages = list(response_user_post_0.context["messages"])
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            str(messages[0]),
+            f"{updated_item_data['label']} was updated successfully",
+        )
+        items = Item.objects.all()
+        self.assertEqual(len(items), 2)
+        self.assertRedirects(response_user_post_0, reverse("sales:item_list"))
+        self.assertContains(
+            response_user_post_0, bytes(updated_item_data["label"], "utf8")
+        )
+
+    def test_delete_view(self):
+        """Check if all users get corresponding response"""
+
+        # Anonymous user get redirect to the login
+        response_anonymous = self.client.get(
+            reverse("sales:item_delete", kwargs={"pk": self.item_0.id}),
+            follow=False,
+        )
+        self.assertEqual(response_anonymous.status_code, 302)
+        self.assertIn(reverse("users:login"), response_anonymous.url)
+
+        # Authenticated user can see the delete page
+        response_user_get = self.default_client.get(
+            reverse("sales:item_delete", kwargs={"pk": self.item_0.id})
+        )
+        self.assertEqual(response_user_get.status_code, 200)
+        self.assertEqual(response_user_get.context["object"], self.item_0)
+        self.assertContains(response_user_get, b"Delete")
+
+        # Authenticated user can << SOFT >> deletea item instance
+        response_user_post_0 = self.default_client.post(
+            reverse("sales:item_delete", kwargs={"pk": self.item_0.id}),
+            follow=True,
+        )
+        self.assertEqual(response_user_post_0.status_code, 200)
+        messages = list(response_user_post_0.context["messages"])
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), "Deleted successfully")
+        items = Item.objects.all()
+        self.assertEqual(len(items), 2)
+        self.assertRedirects(response_user_post_0, reverse("sales:item_list"))
+        self.assertContains(response_user_post_0, b"No item yet.")
+        deleted_item = Item.objects.get(pk=self.item_0.id)
+        self.assertFalse(deleted_item.is_active)
+        self.assertIsNotNone(deleted_item.deleted_date)
+        self.assertEqual(deleted_item.deleted_by, self.user)
