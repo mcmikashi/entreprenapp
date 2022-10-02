@@ -1,0 +1,23 @@
+{% extends 'core/base.html' %}
+{% load i18n %}
+{% block content %}
+<h1 class="text-center mb-2">{% translate "Delete a customer" %}</h1>
+<div class="row my-4">
+    <div class="col-11 col-md-6 mx-auto text-center">
+        <h4>
+            {% translate "You are trying to delete this customer" %} : {{object.name}}
+        </h4>
+        <p>label : {{ object.label }}</p>
+        <p>Description : {{object.description}} </p>
+        <p>Price_duty_free : {{object.price_duty_free}} | Tax : {{object.tax}} </p>
+    </div>
+    <form method="post">
+        {% csrf_token %}
+        {{ form }}
+        <div class="d-grid gap-4 w-25 mx-auto">
+            <button type="submit" class="btn btn-outline-primary">Confirm</button>
+            <a href="{% url 'sales:saler_list' %}" class="btn btn-outline-secondary">Cancel</a>
+          </div>
+    </form>
+</div>
+{% endblock content %}

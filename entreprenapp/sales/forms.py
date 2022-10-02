@@ -3,7 +3,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Div, Field, Layout, Submit
 from django.forms import ModelForm
 
-from .models import Customer, Saler
+from .models import Customer, Item, Saler
 
 
 class SalerForm(ModelForm):
@@ -65,4 +65,28 @@ class CustomerForm(ModelForm):
             "country",
             "email",
             "phone_number",
+        ]
+
+
+class ItemForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_method = "post"
+        self.helper.form_class = "col-11 col-md-8 mx-auto"
+        self.helper.layout = Layout(
+            FloatingField("label"),
+            FloatingField("description", css_class="floating-textarea"),
+            FloatingField("price_duty_free"),
+            FloatingField("tax"),
+            Div(Submit("submit", "Submit"), css_class="d-grid m-3"),
+        )
+
+    class Meta:
+        model = Item
+        fields = [
+            "label",
+            "description",
+            "price_duty_free",
+            "tax",
         ]

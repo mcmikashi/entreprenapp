@@ -8,8 +8,8 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
-from .forms import CustomerForm, SalerForm
-from .models import Customer, Saler
+from .forms import CustomerForm, ItemForm, SalerForm
+from .models import Customer, Item, Saler
 
 
 class SalerListView(CoreListView):
@@ -64,3 +64,30 @@ class CustomerDeleteView(CoreDeleteView):
     model = Customer
     template_name = "sales/customer/delete.html"
     success_url = reverse_lazy("sales:customer_list")
+
+
+class ItemListView(CoreListView):
+    model = Item
+    template_name = "sales/item/list.html"
+
+
+class ItemCreateView(SuccessMessageMixin, CoreCreateView):
+    model = Item
+    form_class = ItemForm
+    template_name = "core/default/add.html"
+    success_url = reverse_lazy("sales:item_list")
+    success_message = _("%(label)s was created successfully")
+
+
+class ItemUpdateView(SuccessMessageMixin, CoreUpdateView):
+    model = Item
+    form_class = ItemForm
+    template_name = "core/default/edit.html"
+    success_url = reverse_lazy("sales:item_list")
+    success_message = _("%(label)s was updated successfully")
+
+
+class ItemDeleteView(CoreDeleteView):
+    model = Item
+    template_name = "sales/item/delete.html"
+    success_url = reverse_lazy("sales:item_list")

@@ -5,6 +5,10 @@ from .views import (
     CustomerDeleteView,
     CustomerListView,
     CustomerUpdateView,
+    ItemCreateView,
+    ItemDeleteView,
+    ItemListView,
+    ItemUpdateView,
     SalerCreateView,
     SalerDeleteView,
     SalerListView,
@@ -41,5 +45,21 @@ urlpatterns = [
         "customer/delete/<int:pk>/",
         CustomerDeleteView.as_view(),
         name="customer_delete",
+    ),
+    path("item/list/", ItemListView.as_view(), name="item_list"),
+    path(
+        "item/create/",
+        ItemCreateView.as_view(),
+        name="item_create",
+    ),
+    path(
+        "item/update/<int:pk>/",
+        ItemUpdateView.as_view(),
+        name="item_update",
+    ),
+    path(
+        "item/delete/<int:pk>/",
+        ItemDeleteView.as_view(),
+        name="item_delete",
     ),
 ]
