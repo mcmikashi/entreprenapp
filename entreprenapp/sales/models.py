@@ -2,6 +2,8 @@ from decimal import Decimal
 
 from core.models import Core
 from django.db import models
+from django.db.models.signals import pre_save
+from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_countries.fields import CountryField
@@ -19,6 +21,12 @@ class SalesActorBase(Core):
 
     def __str__(self):
         return self.name
+
+    def additional_adress(self):
+        additional_adress = f"{self.city}, {self.postal_code}"
+        if self.country:
+            additional_adress = additional_adress + f", {self.country}"
+        return additional_adress
 
     class Meta:
         abstract = True
@@ -136,7 +144,7 @@ class SalesActionBase(Core):
         "Return the total price (including tax) of the oderline."
         return Decimal(
             sum(
-                order_line.subtotal_including_tax
+                order_line.subtotal_tax_price
                 for order_line in self.order_lines.all()
             )
         )
@@ -178,13 +186,6 @@ class Estimate(SalesActionBase):
         new_invoice.save()
         return True
 
-    def save(self, *args, **kwargs):
-        if not self.estimate_saler_number:
-            self.estimate_saler_number = self.saler.estimate_number + 1
-            self.saler.estimate_number += 1
-            self.saler.save()
-        super().save(*args, **kwargs)
-
     class Meta(SalesActionBase.Meta):
         pass
 
@@ -195,12 +196,23 @@ class Invoice(SalesActionBase):
     )
     is_paid = models.BooleanField(_("is paid"))
 
-    def save(self, *args, **kwargs):
-        if not self.invoice_saler_number:
-            self.invoice_saler_number = self.saler.invoice_number + 1
-            self.saler.invoice_number += 1
-            self.saler.save()
-        super().save(*args, **kwargs)
-
     class Meta(SalesActionBase.Meta):
         pass
+
+
+@receiver(pre_save, sender=Estimate)
+def set_estiamte_saler_id(sender, instance, **kwargs):
+    if not instance.estimate_saler_number:
+        saler = instance.saler
+        instance.estimate_saler_number = saler.estimate_number + 1
+        saler.estimate_number += 1
+        saler.save()
+
+
+@receiver(pre_save, sender=Invoice)
+def set_invoice_saler_id(sender, instance, **kwargs):
+    if not instance.invoice_saler_number:
+        saler = instance.saler
+        instance.invoice_saler_number = saler.invoice_number + 1
+        saler.invoice_number += 1
+        saler.save()
