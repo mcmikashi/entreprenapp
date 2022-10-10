@@ -6,11 +6,13 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
-  <link href="{% static 'css/entrprenapp.css' %}" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
-    integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
-    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  {% block css %}
+      <link href="{% static 'css/bootstrap.min.css' %}" rel="stylesheet">
+      <link href="{% static 'css/entrprenapp.css' %}" rel="stylesheet">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+      integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+      crossorigin="anonymous" referrerpolicy="no-referrer" />
+  {% endblock css %}
   <title>Entreprenapp</title>
 </head>
 
@@ -25,7 +27,7 @@
     </header>
   {% endblock header %}
   {% block sidebar %}
-    <div class="offcanvas offcanvas-start w-25" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1"
+    <div class="offcanvas offcanvas-start" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1"
       id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
       <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="sidebarOffcanvasLabel">Menu</h5>
@@ -62,6 +64,12 @@
       <p class="mb-0 text-white text-center">Copyright - 2022 - Mcmikashi</p>
     </footer>
   {% endblock footer %}
-  <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+
+
+  {% block default_script %}
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+  {% endblock default_script %}
+
+  {% block custom_script %}{% endblock custom_script %}
 </body>
 </html>
