@@ -204,7 +204,7 @@ class EstimateTest(TestCase):
         for order_line in order_lines:
             # calculate the total of the estimate
             total_price_duty_free += order_line.subtotal_duty_free
-            total_tax_price += order_line.subtotal_including_tax
+            total_tax_price += order_line.subtotal_tax_price
             total_price_including_tax += order_line.subtotal_including_tax
 
         self.assertEqual(estimate.saler, estimate_data["saler"])
@@ -307,7 +307,7 @@ class InvoiceTest(TestCase):
         for order_line in order_lines:
             # calculate the total of the invoice
             total_price_duty_free += order_line.subtotal_duty_free
-            total_tax_price += order_line.subtotal_including_tax
+            total_tax_price += order_line.subtotal_tax_price
             total_price_including_tax += order_line.subtotal_including_tax
 
         self.assertEqual(invoice.saler, invoice_data["saler"])
