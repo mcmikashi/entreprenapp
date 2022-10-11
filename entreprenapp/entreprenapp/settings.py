@@ -124,7 +124,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = "static/"
-STATIC_ROOT = PurePath(BASE_DIR, "static")
+STATIC_ROOT = PurePath(BASE_DIR, "assets")
+STATICFILES_DIRS = [
+    PurePath(BASE_DIR, "static"),
+]
 
 # Media files
 MEDIA_URL = "media/"
@@ -135,11 +138,11 @@ MEDIA_ROOT = PurePath(BASE_DIR, "media")
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-#Default login page
+# Default login page
 LOGIN_URL = "users:login"
 
 # Setting default user model
-AUTH_USER_MODEL = 'users.CustomUser'
+AUTH_USER_MODEL = "users.CustomUser"
 
 # CRISPY CONFIG
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -147,4 +150,4 @@ CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 # Email setting
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
