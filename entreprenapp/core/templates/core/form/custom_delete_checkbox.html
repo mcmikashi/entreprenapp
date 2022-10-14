@@ -1,0 +1,6 @@
+{% load crispy_forms_field %}
+
+<div div_{{ field.auto_id }}>
+    {% crispy_field field 'class' 'btn-check' %}
+    <label class="btn btn-outline-danger" for="{{ field.auto_id }}">Delete</label>
+</div>
