@@ -35,10 +35,10 @@
       </div>
       <div class="offcanvas-body">
         <nav class="nav flex-column m-2 p-2" id="sidebar">
-          <a class="nav-link text-capitalize" href="#"><i class="fa-solid fa-building"></i> saler</a>
-          <a class="nav-link text-capitalize" href="#"><i class="fa-solid fa-user-group"></i> customer</a>
-          <a class="nav-link text-capitalize" href="#"><i class="fa-solid fa-dolly"></i> item</a>
-          <a class="nav-link text-capitalize" href="#"><i class="fa-regular fa-file-lines"></i> estimate</a>
+          <a class="nav-link text-capitalize" href="{% url 'sales:saler_list' %}"><i class="fa-solid fa-building"></i> saler</a>
+          <a class="nav-link text-capitalize" href="{% url 'sales:customer_list' %}"><i class="fa-solid fa-user-group"></i> customer</a>
+          <a class="nav-link text-capitalize" href="{% url 'sales:item_list' %}"><i class="fa-solid fa-dolly"></i> item</a>
+          <a class="nav-link text-capitalize" href="{% url 'sales:estimate_list' %}"><i class="fa-regular fa-file-lines"></i> estimate</a>
           <a class="nav-link text-capitalize" href="#"><i class="fa-solid fa-file-invoice"></i> invoice</a>
         </nav>
       </div>

@@ -5,6 +5,12 @@ from .views import (
     CustomerDeleteView,
     CustomerListView,
     CustomerUpdateView,
+    EstimateCreateView,
+    EstimateDeleteView,
+    EstimateDetailView,
+    EstimateListView,
+    EstimatePDFView,
+    EstimateUpdateView,
     ItemCreateView,
     ItemDeleteView,
     ItemListView,
@@ -61,5 +67,40 @@ urlpatterns = [
         "item/delete/<int:pk>/",
         ItemDeleteView.as_view(),
         name="item_delete",
+    ),
+    path(
+        "estimate/create/",
+        EstimateCreateView.as_view(),
+        name="estimate_create",
+    ),
+    path(
+        "estimate/pdf/<int:pk>",
+        EstimatePDFView.as_view(),
+        name="estimate_pdf",
+    ),
+    path(
+        "estimate/delete/<int:pk>",
+        EstimateDeleteView.as_view(),
+        name="estimate_delete",
+    ),
+    path(
+        "estimate/update/<int:pk>",
+        EstimateUpdateView.as_view(),
+        name="estimate_update",
+    ),
+    path(
+        "estimate/list/",
+        EstimateListView.as_view(),
+        name="estimate_list",
+    ),
+    path(
+        "estimate/detail/<int:pk>",
+        EstimateDetailView.as_view(),
+        name="estimate_detail",
+    ),
+    path(
+        "estimate/update/<int:pk>",
+        EstimateUpdateView.as_view(),
+        name="estimate_update",
     ),
 ]

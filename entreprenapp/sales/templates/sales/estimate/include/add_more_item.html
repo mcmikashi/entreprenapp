@@ -1,0 +1,16 @@
+<script>
+    let button_add_more = document.getElementById('add_more_item')
+    const parent_form = document.getElementById('oder_line_form_list')
+    button_add_more.addEventListener('click', event => {
+        if (event){
+            event.preventDefault
+        }
+        const input_form_number = document.getElementById('id_form-TOTAL_FORMS')
+        let number_of_form = input_form_number.value
+        let custom_form = document.querySelector('#default_order_line_form > div.row').cloneNode(true)
+        const regex = RegExp('__prefix__','g')
+        custom_form.innerHTML = custom_form.innerHTML.replace(regex, 'form-'+number_of_form)
+        input_form_number.value = parseInt(number_of_form) + 1
+        parent_form.append(custom_form)
+    });
+</script>

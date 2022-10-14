@@ -1,0 +1,66 @@
+
+*{
+    font-family: 'Helvetica';
+}
+.container-fluid{
+    padding: 2%;
+}
+h1{
+    font-weight: 700;
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+h3{
+    font-size: large;
+}
+
+#invoice-information *{
+ text-align: center;
+}
+
+table{
+    width: 100%;
+    border-collapse: collapse;
+    border-width: 2px;
+    color: black;
+    table-layout: auto;
+}
+
+table td, table th {
+    border-width: 2px;
+    border-color: black;
+    border-style: solid;
+    padding: 5px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.invisible{
+    border: none;
+}
+.table-primary{
+    background-color: #9EC5FE;
+}
+
+.table-info{
+    background-color: #CEE2FE;
+}
+
+table .row_num{
+    width: 2%;
+}
+table .label{
+    width: 38%;
+}
+table .simple_num{
+    width: 6%;
+}
+table .tax{
+    width: 10%;
+}
+table .price_num{
+    width: 20%;
+}
+.mini-bold{
+    font-weight: 700;
+}
