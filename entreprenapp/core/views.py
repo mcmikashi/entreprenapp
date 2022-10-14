@@ -78,3 +78,4 @@ class CoreDetailView(LoginRequiredMixin, DetailView):
                 return super().get(request)
             else:
                 raise Http404("This data as been deleted")
+        return super().get(request)
