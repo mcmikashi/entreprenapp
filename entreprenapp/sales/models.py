@@ -36,7 +36,7 @@ class SalesActorBase(Core):
 class Saler(SalesActorBase):
     logo = models.ImageField(
         _("logo"),
-        upload_to=None,
+        upload_to="saler/logo/",
         height_field=None,
         width_field=None,
         max_length=None,
