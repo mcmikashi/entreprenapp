@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404, HttpResponseRedirect
+from django.shortcuts import render
 from django.utils import timezone
 from django.views.generic.detail import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
@@ -79,3 +80,12 @@ class CoreDetailView(LoginRequiredMixin, DetailView):
             else:
                 raise Http404("This data as been deleted")
         return super().get(request)
+
+
+def custom_404(request, exception):
+    print(exception)
+    return render(request, "core/error/404.html", status=404)
+
+
+def custom_500(request):
+    return render(request, "core/error/500.html", status=500)
