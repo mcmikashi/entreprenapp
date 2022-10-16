@@ -1,0 +1,90 @@
+{% extends 'core/base.html' %}
+{% block content %}
+<div class="row p-1 min-vh-100 bg-white border border-2 border-dark m-3">
+    <div class="col-11 mx-auto">
+        <section id="invoice-information" class="d-flex justify-content-between">
+            <h1 id="estiamte_title">
+                Estimate n°{{ object.estimate_saler_number|stringformat:"08d" }}
+            </h1>
+            <h3>
+                Date : {{ object.date|date:"d M Y" }}
+            </h3>
+            <h3>
+                Validity : {{ object.validity_date|date:"d M Y" }}
+            </h3>
+        </section>
+        <hr/>
+        <section id="saler-information">
+            <p class="m-0">{{object.saler.name}}</p>
+            <p class="m-0">{{object.saler.adress}}</p>
+            <p class="m-0">
+                {{object.saler.city}} , {{object.saler.postal_code}}
+                {% if object.saler.country %}
+                    , <strong>{{object.saler.country.name }}</strong>
+                {% endif %}
+            </p>
+            <p class="m-0">{{ object.saler.email }}</p>
+            <p>{{ object.saler.phone_number }}</p>
+        </section>
+        <hr/>
+        <section id="customer-information">
+            <p class="m-0"><strong class="mini-bold">Billed to :</strong></p>
+            <p class="m-0">{{object.customer.name}}</p>
+            <p class="m-0">{{object.customer.adress}}</p>
+            <p>
+                {{object.customer.city}} , {{object.customer.postal_code}}
+                {% if object.customer.country %}
+                    , {object.customer.country}
+                {% endif %}
+            </p>
+            {% if object.customer.email %}
+                <p>{{ object.customer.email }}</p>
+            {% endif %}
+            {% if object.customer.email %}
+                <p>{{ object.customer.phone_number }}</p>
+            {% endif %}
+        </section>
+        <section id="order-information">
+            <table class="table table-borderless ">
+                <thead>
+                  <tr class="table-info">
+                    <th scope="col" class="row_num">#</th>
+                    <th scope="col" class="label">label</th>
+                    <th scope="col" class="simple_num">Q.</th>
+                    <th scope="col" class="price_num">Unit cost</th>
+                    <th scope="col" class="tax">Tax</th>
+                    <th scope="col" class="price_num">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                    {% for order_line in object.order_lines.all %}
+                        <tr>
+                            <th scope="row">{{ forloop.counter }}</th>
+                            <td>{{ order_line.item.label }}</td>
+                            <td>{{ order_line.quantity }}</td>
+                            <td>{{ order_line.item.price_duty_free }} €</td>
+                            <td>{{ order_line.item.tax }} %</td>
+                            <td>{{ order_line.subtotal_including_tax|floatformat:"-2g" }} €</td>
+                        </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan="4" class="invisible"></td>
+                        <td>Total DF</td>
+                        <td>{{ object.total_price_duty_free|floatformat:"-2g" }} €</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="invisible"></td>
+                        <td>Total Tax</td>
+                        <td>{{ object.total_tax_price|floatformat:"-2g" }} €</td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" class="invisible"></td>
+                        <td class="table-primary">Total</td>
+                        <td class="table-primary">{{ object.total_price_including_tax|floatformat:"-2g" }} €</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+</div>
+{% endblock content %}

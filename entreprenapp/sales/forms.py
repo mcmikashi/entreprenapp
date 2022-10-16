@@ -6,7 +6,7 @@ from crispy_forms.layout import Column, Div, Field, Layout, Row, Submit
 from dateutil.relativedelta import relativedelta
 from django.forms import ModelForm
 
-from .models import Customer, Estimate, Item, OrderLine, Saler
+from .models import Customer, Estimate, Invoice, Item, OrderLine, Saler
 
 
 class SalerForm(ModelForm):
@@ -171,3 +171,25 @@ class EstimateForm(ModelForm):
     class Meta:
         model = Estimate
         fields = ["saler", "customer", "date", "validity_date"]
+
+
+class InvoiceForm(ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["date"].initial = date.today()
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.layout = Layout(
+            Row(
+                Column(FloatingField("saler")),
+                Column(FloatingField("customer")),
+            ),
+            Row(
+                Column(FloatingField("date")),
+                Column(Field("is_paid")),
+            ),
+        )
+
+    class Meta:
+        model = Invoice
+        fields = ["saler", "customer", "date", "is_paid"]

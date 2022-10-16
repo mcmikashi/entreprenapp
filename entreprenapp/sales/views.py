@@ -21,13 +21,14 @@ from xhtml2pdf import pisa
 from .forms import (
     CustomerForm,
     EstimateForm,
+    InvoiceForm,
     ItemForm,
     OrderLineForm,
     OrderLineFormSetHelper,
     OrderLineFormUpdateSetHelper,
     SalerForm,
 )
-from .models import Customer, Estimate, Item, OrderLine, Saler
+from .models import Customer, Estimate, Invoice, Item, OrderLine, Saler
 
 
 class SalerListView(CoreListView):
@@ -215,17 +216,18 @@ class GenericSalesActionPDFView(LoginRequiredMixin, View):
             instance = get_object_or_404(self.model, pk=kwargs.get("pk"))
             if not self.request.user.is_superuser and not instance.is_active:
                 return Http404("This page doesn't exist")
-        template_path = "sales/estimate/pdf.html"
         context = {"object": instance}
         # set the file name
         if isinstance(instance, Estimate):
             file_name = (
                 f"filename=Estimate n° {instance.estimate_saler_number:08}"
             )
+            template_path = "sales/estimate/pdf.html"
         else:
             file_name = (
                 f"filename=Invoice n° {instance.invoice_saler_number:08}"
             )
+            template_path = "sales/invoice/pdf.html"
         # Create a Django response object, and specify content_type as pdf
         response = HttpResponse(content_type="application/pdf")
         response["Content-Disposition"] = f"as_attachment=False; {file_name}"
@@ -275,3 +277,37 @@ class EstimateDeleteView(SuccessMessageMixin, CoreDeleteView):
 
 class EstimatePDFView(GenericSalesActionPDFView):
     model = Estimate
+
+
+class InvoiceListView(CoreListView):
+    model = Invoice
+    template_name = "sales/invoice/list.html"
+
+
+class InvoiceDetailView(CoreDetailView):
+    model = Invoice
+    template_name = "sales/invoice/detail.html"
+
+
+class InvoiceCreateView(GenericSalesActionCreateView):
+    model = Invoice
+    form_class = InvoiceForm
+    template_name = "sales/invoice/add.html"
+    success_url = reverse_lazy("sales:invoice_list")
+
+
+class InvoiceUpdateView(GenericSalesActionUpdateView):
+    model = Invoice
+    form_class = InvoiceForm
+    template_name = "sales/invoice/edit.html"
+    success_url = reverse_lazy("sales:invoice_list")
+
+
+class InvoiceDeleteView(SuccessMessageMixin, CoreDeleteView):
+    model = Invoice
+    template_name = "sales/invoice/delete.html"
+    success_url = reverse_lazy("sales:invoice_list")
+
+
+class InvoicePDFView(GenericSalesActionPDFView):
+    model = Invoice
