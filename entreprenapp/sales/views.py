@@ -111,21 +111,12 @@ class ItemDeleteView(CoreDeleteView):
     success_url = reverse_lazy("sales:item_list")
 
 
-class EstimateListView(CoreListView):
-    model = Estimate
-    template_name = "sales/estimate/list.html"
+"""Generic sales action views"""
 
 
-class EstimateDetailView(CoreDetailView):
-    model = Estimate
-    template_name = "sales/estimate/detail.html"
+class GenericSalesActionCreateView(LoginRequiredMixin, FormView):
 
-
-class EstimateCreateView(LoginRequiredMixin, FormView):
-    model = Estimate
-    form_class = EstimateForm
-    template_name = "sales/estimate/add.html"
-    success_url = reverse_lazy("sales:estimate_list")
+    success_url = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -146,34 +137,35 @@ class EstimateCreateView(LoginRequiredMixin, FormView):
                 if order_line_data:
                     order_line = OrderLine.objects.create(**order_line_data)
                 order_line_instances.append(order_line)
-            estimate = Estimate.objects.create(
+            instance = self.model.objects.create(
                 **form.cleaned_data,
                 created_by=self.request.user,
             )
-            estimate.order_lines.set(order_line_instances)
-            estimate.save()
+            instance.order_lines.set(order_line_instances)
+            instance.save()
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                _("The estimate was created successfully"),
+                _(
+                    f"The {self.model.__name__.lower()} "
+                    "was created successfully"
+                ),
             )
-            return redirect(reverse_lazy("sales:estimate_list"))
+            return redirect(self.success_url)
         else:
             return self.render_to_response(
                 self.get_context_data(form=form, formset=formset)
             )
 
 
-class EstimateUpdateView(LoginRequiredMixin, FormView):
-    model = Estimate
-    form_class = EstimateForm
-    template_name = "sales/estimate/edit.html"
-    success_url = reverse_lazy("sales:estimate_list")
+class GenericSalesActionUpdateView(LoginRequiredMixin, FormView):
+
+    success_url = None
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         object_to_update = get_object_or_404(
-            Estimate, pk=self.kwargs.get("pk")
+            self.model, pk=self.kwargs.get("pk")
         )
         default_formset = modelformset_factory(
             OrderLine,
@@ -203,19 +195,16 @@ class EstimateUpdateView(LoginRequiredMixin, FormView):
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                _("The estimate was updated successfully"),
+                _(
+                    f"The {self.model.__name__.lower()} "
+                    "was updated successfully"
+                ),
             )
-            return redirect(reverse_lazy("sales:estimate_list"))
+            return redirect(self.success_url)
         else:
             return self.render_to_response(
                 self.get_context_data(form=form, formset=formset)
             )
-
-
-class EstimateDeleteView(SuccessMessageMixin, CoreDeleteView):
-    model = Estimate
-    template_name = "sales/estimate/delete.html"
-    success_url = reverse_lazy("sales:estimate_list")
 
 
 class GenericSalesActionPDFView(LoginRequiredMixin, View):
@@ -252,6 +241,36 @@ class GenericSalesActionPDFView(LoginRequiredMixin, View):
         if pisa_status.err:
             return HttpResponse("We had some errors <pre>" + html + "</pre>")
         return response
+
+
+class EstimateListView(CoreListView):
+    model = Estimate
+    template_name = "sales/estimate/list.html"
+
+
+class EstimateDetailView(CoreDetailView):
+    model = Estimate
+    template_name = "sales/estimate/detail.html"
+
+
+class EstimateCreateView(GenericSalesActionCreateView):
+    model = Estimate
+    form_class = EstimateForm
+    template_name = "sales/estimate/add.html"
+    success_url = reverse_lazy("sales:estimate_list")
+
+
+class EstimateUpdateView(GenericSalesActionUpdateView):
+    model = Estimate
+    form_class = EstimateForm
+    template_name = "sales/estimate/edit.html"
+    success_url = reverse_lazy("sales:estimate_list")
+
+
+class EstimateDeleteView(SuccessMessageMixin, CoreDeleteView):
+    model = Estimate
+    template_name = "sales/estimate/delete.html"
+    success_url = reverse_lazy("sales:estimate_list")
 
 
 class EstimatePDFView(GenericSalesActionPDFView):
