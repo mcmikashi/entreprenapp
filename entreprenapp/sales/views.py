@@ -218,20 +218,28 @@ class EstimateDeleteView(SuccessMessageMixin, CoreDeleteView):
     success_url = reverse_lazy("sales:estimate_list")
 
 
-class EstimatePDFView(LoginRequiredMixin, View):
+class GenericSalesActionPDFView(LoginRequiredMixin, View):
+    model = None
+
     def get(self, request, *args, **kwargs):
         if kwargs.get("pk"):
-            estimate = get_object_or_404(Estimate, pk=kwargs.get("pk"))
-            if not self.request.user.is_superuser and not estimate.is_active:
+            instance = get_object_or_404(self.model, pk=kwargs.get("pk"))
+            if not self.request.user.is_superuser and not instance.is_active:
                 return Http404("This page doesn't exist")
         template_path = "sales/estimate/pdf.html"
-        context = {"object": estimate}
+        context = {"object": instance}
+        # set the file name
+        if isinstance(instance, Estimate):
+            file_name = (
+                f"filename=Estimate n° {instance.estimate_saler_number:08}"
+            )
+        else:
+            file_name = (
+                f"filename=Invoice n° {instance.invoice_saler_number:08}"
+            )
         # Create a Django response object, and specify content_type as pdf
         response = HttpResponse(content_type="application/pdf")
-        response["Content-Disposition"] = (
-            "as_attachment=False; "
-            f"filename=Estimate n° {estimate.estimate_saler_number:08}"
-        )
+        response["Content-Disposition"] = f"as_attachment=False; {file_name}"
         # find the template and render it.
         template = get_template(template_path)
         html = template.render(context)
@@ -244,3 +252,7 @@ class EstimatePDFView(LoginRequiredMixin, View):
         if pisa_status.err:
             return HttpResponse("We had some errors <pre>" + html + "</pre>")
         return response
+
+
+class EstimatePDFView(GenericSalesActionPDFView):
+    model = Estimate
