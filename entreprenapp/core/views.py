@@ -78,12 +78,11 @@ class CoreDetailView(LoginRequiredMixin, DetailView):
             if self.request.user.is_superuser:
                 return super().get(request)
             else:
-                raise Http404("This data as been deleted")
+                raise Http404()
         return super().get(request)
 
 
 def custom_404(request, exception):
-    print(exception)
     return render(request, "core/error/404.html", status=404)
 
 
