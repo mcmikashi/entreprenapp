@@ -1,3 +1,14 @@
 textarea.floating-textarea{
     height: 150px !important;
 }
+
+div.chat{
+    height: 70vmin;
+}
+.author_date_message p{
+    font-size: .750em;
+}
+
+#chat-log p{
+ margin-bottom: 0;
+}

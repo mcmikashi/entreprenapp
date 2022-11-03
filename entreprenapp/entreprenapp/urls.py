@@ -22,6 +22,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("users.urls")),
     path("sales/", include("sales.urls")),
+    path("discuss/", include("discuss.urls")),
 ]
 
 handler404 = "core.views.custom_404"

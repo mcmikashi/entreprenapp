@@ -1,0 +1,119 @@
+{% extends 'core/base.html' %}
+{% block content %}
+    <section class="row m-2">
+        <div class="col-6 col-md-2 mx-auto mx-md-0 my-4 border border-2 rounded-3 p-0">
+            <ul class="nav nav-pills flex-column text-capitalize">
+                <li class="nav-item">
+                  <a class="nav-link
+                    {% if room_name == 'general' %}
+                        active
+                    {% endif %}"
+                    href="{% url 'discuss:room' 'general' %}">general</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link
+                    {% if room_name == 'sales' %}
+                        active
+                    {% endif %}"
+                    href="{% url 'discuss:room' 'sales' %}">sales</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link
+                    {% if room_name == 'other' %}
+                      active
+                    {% endif %}"
+                    href="{% url 'discuss:room' 'other' %}">other</a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-10 col-md-6 mx-auto border border-2 rounded-2 my-4 p-3">
+            <div id="chat-log" class="chat d-flex flex-column bg-white border border-2 border-info rounded-4 my-2 p-4 gap-2 overflow-auto">
+                {% for message in chat_messages %}
+                    {% if user == message.author %}
+                        <div class="d-flex justify-content-between author_date_message">
+                            <p>{{ message.get_full_name }}</p>
+                            <p>{{ message.date_time|date:"SHORT_DATETIME_FORMAT"}}</p>
+                        </div>
+                        <div class="bg-info rounded-2 w-75 align-self-end">
+                            <p class="p-2">{{ message.message}}</p>
+                        </div>
+                    {% else %}
+                        <div class="d-flex justify-content-between author_date_message">
+                            <p>{{ message.date_time|date:"SHORT_DATETIME_FORMAT" }}</p>
+                            <p>{{ message.get_full_name }}</p>
+                        </div>
+                        <div class="align-self-start bg-light border border-2 w-75 p-2">
+                            <p class="p-2">{{ message.message}}</p>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            <div class="form-floating mb-2">
+                <textarea class="form-control" placeholder="write your message here" id="chat-message-input"></textarea>
+                <label for="chat-message-input">Message</label>
+            </div>
+            <input id="chat-message-submit" type="button" value="Send" class="btn btn btn-primary">
+        </div>
+    </div>
+
+{% endblock content %}
+{% block custom_script %}
+{{ room.name|json_script:"room-name" }}
+{{ user.id|json_script:"user_id" }}
+<script>
+    const roomName = JSON.parse(document.getElementById('room-name').textContent);
+    const currentUser = JSON.parse(document.getElementById('user_id').textContent);
+
+    const chatSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/chat/'
+        + roomName
+        + '/'
+    );
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        let info_div = document.createElement('div')
+        let message_div = document.createElement('div')
+        let message_date = new Date(data.date_time).toLocaleString()
+        let info_inner_html;
+        let message_css_class;
+        info_div.setAttribute('class','d-flex justify-content-between author_date_message')
+        let messsage_info = `<p class='text-break'>${data.message}<p>`
+        if (data.author_id === currentUser){
+            message_css_class = 'align-self-end bg-info rounded-2 w-75 p-2'
+            info_inner_html = `<p>${message_date}</p><p>${data.author_full_name}</p>`
+        }else{
+            message_css_class = 'align-self-start bg-light border border-2 w-75 p-2'
+            info_inner_html = `<p>${message_date}</p><p>${data.date_time}</p>`
+        }
+        info_div.innerHTML = info_inner_html
+        message_div.setAttribute('class', message_css_class)
+        message_div.innerHTML = messsage_info
+        document.getElementById('chat-log').append(info_div)
+        document.getElementById('chat-log').append(message_div)
+
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    document.querySelector('#chat-message-input').focus();
+    document.querySelector('#chat-message-input').onkeyup = function(e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+    document.querySelector('#chat-message-submit').onclick = function(e) {
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+        chatSocket.send(JSON.stringify({
+            'message': message,
+        }));
+        messageInputDom.value = '';
+    };
+</script>
+
+{% endblock custom_script %}
