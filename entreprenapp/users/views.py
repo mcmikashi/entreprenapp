@@ -1,11 +1,18 @@
-from django.contrib.auth.views import (LoginView, PasswordResetCompleteView,
-                                       PasswordResetConfirmView,
-                                       PasswordResetDoneView,
-                                       PasswordResetView)
+from django.contrib.auth.views import (
+    LoginView,
+    PasswordResetCompleteView,
+    PasswordResetConfirmView,
+    PasswordResetDoneView,
+    PasswordResetView,
+)
+from django.http import Http404
 from django.urls import reverse_lazy
 
-from .forms import (CustomAuthenticationForm, CustomPasswordResetForm,
-                    CustomSetPasswordForm)
+from .forms import (
+    CustomAuthenticationForm,
+    CustomPasswordResetForm,
+    CustomSetPasswordForm,
+)
 
 
 class CustomLoginView(LoginView):
@@ -24,6 +31,12 @@ class CustomPasswordResetConfirmView(PasswordResetConfirmView):
     form_class = CustomSetPasswordForm
     template_name = "users/confirm_password_reset.html"
     success_url = reverse_lazy("users:password_reset_complete")
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if context["form"] is None:
+            raise Http404("The link is expired or invalid.")
+        return context
 
 
 class CustomPasswordResetDoneView(PasswordResetDoneView):

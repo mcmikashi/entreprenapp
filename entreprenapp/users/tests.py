@@ -126,40 +126,53 @@ class UsersViewTests(TestCase):
         self.assertEqual(response_get_valid_token.status_code, 200)
         self.assertContains(response_get_valid_token, b"Change your password")
 
-        # Send the new password
-        user_new_password = {
-            "new_password1": "anewstrongpasswordforadmin123:!",
-            "new_password2": "anewstrongpasswordforadmin123:!",
+        # Change the new password
+        new_password = {
+            "new_password1": "anewstrongpassword85:!",
+            "new_password2": "anewstrongpassword85:!",
         }
+
         response_post_valid_token = self.client.post(
             reverse(
                 "users:password_reset_confirm",
-                kwargs={"uidb64": uid_user, "token": token},
+                kwargs={"uidb64": uid_user, "token": "set-password"},
             ),
-            user_new_password,
+            new_password,
             follow=True,
         )
-        response_post_valid_token
         self.assertEqual(response_post_valid_token.status_code, 200)
         self.assertContains(response_post_valid_token, b"Well done")
         self.assertContains(
             response_post_valid_token, b"Your password has been set."
         )
         login_url = reverse("users:login")
-        # check if the login url is on the page
+        # Check if the login url is on the page
         self.assertContains(
             response_post_valid_token, bytes(login_url, "utf-8")
+        )
+        # Check that the password has been changed
+        self.assertFalse(
+            self.client.login(
+                username=self.admin_user_data["email"],
+                password=self.admin_user_data["password"],
+            )
+        )
+        self.assertTrue(
+            self.client.login(
+                username=self.admin_user_data["email"],
+                password=new_password["new_password1"],
+            )
         )
 
     def test_password_reset_confirm_invalid_token(self):
         # With an invalid token user can acces to the get page
         token = "123tokennotgood"
         uid_user = urlsafe_base64_encode(force_bytes(404))
-        response_get_valid_token = self.client.get(
+        response_get_invalid_token = self.client.get(
             reverse(
                 "users:password_reset_confirm",
                 kwargs={"uidb64": uid_user, "token": token},
             ),
             follow=True,
         )
-        self.assertEqual(response_get_valid_token.status_code, 404)
+        self.assertEqual(response_get_invalid_token.status_code, 404)
