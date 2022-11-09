@@ -1,5 +1,10 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.tokens import default_token_generator
+from django.core import mail
 from django.test import TestCase
+from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 
 
 class UsersManagersTests(TestCase):
@@ -73,3 +78,88 @@ class UsersManagersTests(TestCase):
                 password="megapasswordforadmin123",
                 is_staff=False,
             )
+
+
+class UsersViewTests(TestCase):
+    def setUp(self):
+        self.UserModel = get_user_model()
+
+        self.admin_user_data = {
+            "email": "superuser@test.com",
+            "password": "asuperpassword1234",
+        }
+        self.UserModel.objects.create_superuser(**self.admin_user_data)
+
+    def test_reset_password(self):
+        response_get = self.client.get(
+            reverse("users:password_reset"), follow=False
+        )
+        self.assertEqual(response_get.status_code, 200)
+        self.assertContains(response_get, b"password")
+
+        response_post_0 = self.client.post(
+            reverse("users:password_reset"),
+            {"email": self.admin_user_data["email"]},
+            follow=True,
+        )
+        self.assertEqual(response_post_0.status_code, 200)
+        self.assertContains(response_post_0, b"Check the next step")
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].to[0], self.admin_user_data["email"])
+        self.assertEqual(
+            mail.outbox[0].subject, "Password reset on testserver"
+        )
+        self.assertIn("http://testserver/accounts/", mail.outbox[0].body)
+
+    def test_password_reset_confirm_valid_token(self):
+        # With a valid token user can acces to the get page
+        user = self.UserModel.objects.get(email="superuser@test.com")
+        token = default_token_generator.make_token(user)
+        uid_user = (urlsafe_base64_encode(force_bytes(user.pk)),)
+        response_get_valid_token = self.client.get(
+            reverse(
+                "users:password_reset_confirm",
+                kwargs={"uidb64": uid_user, "token": token},
+            ),
+            follow=True,
+        )
+        self.assertEqual(response_get_valid_token.status_code, 200)
+        self.assertContains(response_get_valid_token, b"Change your password")
+
+        # Send the new password
+        user_new_password = {
+            "new_password1": "anewstrongpasswordforadmin123:!",
+            "new_password2": "anewstrongpasswordforadmin123:!",
+        }
+        response_post_valid_token = self.client.post(
+            reverse(
+                "users:password_reset_confirm",
+                kwargs={"uidb64": uid_user, "token": token},
+            ),
+            user_new_password,
+            follow=True,
+        )
+        response_post_valid_token
+        self.assertEqual(response_post_valid_token.status_code, 200)
+        self.assertContains(response_post_valid_token, b"Well done")
+        self.assertContains(
+            response_post_valid_token, b"Your password has been set."
+        )
+        login_url = reverse("users:login")
+        # check if the login url is on the page
+        self.assertContains(
+            response_post_valid_token, bytes(login_url, "utf-8")
+        )
+
+    def test_password_reset_confirm_invalid_token(self):
+        # With an invalid token user can acces to the get page
+        token = "123tokennotgood"
+        uid_user = urlsafe_base64_encode(force_bytes(404))
+        response_get_valid_token = self.client.get(
+            reverse(
+                "users:password_reset_confirm",
+                kwargs={"uidb64": uid_user, "token": token},
+            ),
+            follow=True,
+        )
+        self.assertEqual(response_get_valid_token.status_code, 404)
