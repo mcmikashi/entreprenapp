@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from core.models import Core
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
@@ -92,7 +93,9 @@ class OrderLine(Core):
     item = models.ForeignKey(
         "sales.Item", verbose_name=_("item"), on_delete=models.CASCADE
     )
-    quantity = models.IntegerField(_("quantity"))
+    quantity = models.PositiveIntegerField(
+        _("quantity"), default=1, validators=[MinValueValidator(1)]
+    )
 
     @property
     def subtotal_duty_free(self) -> Decimal:
