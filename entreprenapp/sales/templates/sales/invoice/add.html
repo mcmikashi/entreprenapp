@@ -17,6 +17,7 @@
             {% crispy formset order_lines_helper %}
         </div>
         <a class="btn btn-outline-success mb-2" id="add_more_item">Add more item</a>
+        <p class="p-2 my-2 border border-2 border-success rounded-2">Total price : <span id="total_price_dc"></span></p>
         <div class="row">
             <div class="col-6 mx-auto">
                 <div class='d-grid'>
@@ -31,4 +32,5 @@
 
 {% block custom_script %}
     {% include 'sales/estimate/include/add_more_item.html' %}
+    {% include 'sales/estimate/include/update_price.html' %}
 {% endblock custom_script %}

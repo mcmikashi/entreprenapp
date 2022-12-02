@@ -1,0 +1,50 @@
+<script>
+  async function updateLine(event){
+        if (event.target.classList.contains('order_line_item')){
+          let indexItem = event.target.value
+          const parent = event.target.closest(".row")
+          if (indexItem){
+            let total = event.target.querySelector(`[data-index="${indexItem}"]`).getAttribute('data-total')
+            let quantity = parent.querySelector('.order_line_quantity').value
+            let totalLine = (total * quantity).toFixed(2)
+            const spanToUpdate = parent.querySelector(".total_line")
+            spanToUpdate.innerHTML = totalLine
+            spanToUpdate.dataset.total_line = totalLine
+          }else{
+            parent.querySelector(".total_line").innerHTML = 0
+          }
+        }
+        if(event.target.classList.contains('order_line_quantity')){
+          let quantity = event.target.value
+          const parent = event.target.closest(".row")
+          const spanToUpdate = parent.querySelector(".total_line")
+          let indexItem = parent.querySelector('.order_line_item').value
+          if (indexItem){
+            let total = parent.querySelector(`[data-index="${indexItem}"]`).getAttribute('data-total')
+            let totalLine = (total * quantity).toFixed(2)
+            spanToUpdate.innerHTML = totalLine
+            spanToUpdate.dataset.total_line = totalLine
+          }else{
+            spanToUpdate.innerHTML = 0
+          }
+        }
+    }
+  async function getTotalPrice(event) {
+    if (event.target.classList.contains('order_line_item_delete')) {
+      const parent = event.target.closest(".row")
+        parent.querySelector(".oderline_total").classList.toggle('total_line')
+    } else {
+    await updateLine(event)
+    }
+    let orderLinePrices = document.querySelectorAll("form span.total_line")
+    let totalPrice = 0;
+    for (let index = 0; index < orderLinePrices.length; index++) {
+        if (orderLinePrices[index].dataset.total_line) {
+          totalPrice +=  parseFloat(orderLinePrices[index].dataset.total_line)
+        }
+    }
+    document.getElementById("total_price_dc").innerHTML = totalPrice.toFixed(2)
+    }
+    const form = document.querySelector('form');
+    form.addEventListener('change', getTotalPrice)
+</script>

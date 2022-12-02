@@ -1,0 +1,15 @@
+<script>
+    let orderLineItems = document.querySelectorAll("form .order_line_item")
+    for (let index = 0; index < orderLineItems.length; index++) {
+        const parent = orderLineItems[index].closest(".row")
+        if (orderLineItems[index].value) {
+          let total = orderLineItems[index].querySelector(`[data-index="${orderLineItems[index].value}"]`).getAttribute('data-total')
+          let quantity = parent.querySelector('.order_line_quantity').value
+          parent.querySelector(".total_line").innerHTML = total * quantity
+          parent.querySelector(".total_line").dataset.total_line = total * quantity
+
+        }else{
+            parent.querySelector(".total_line").innerHTML = 0
+        }
+    }
+</script>
