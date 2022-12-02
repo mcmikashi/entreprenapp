@@ -9,7 +9,7 @@
         let number_of_form = input_form_number.value
         let custom_form = document.querySelector('#default_order_line_form > div.row').cloneNode(true)
         const regex = RegExp('__prefix__','g')
-        custom_form.innerHTML = custom_form.innerHTML.replace(regex, 'form-'+number_of_form)
+        custom_form.innerHTML = custom_form.innerHTML.replace(regex, number_of_form)
         input_form_number.value = parseInt(number_of_form) + 1
         parent_form.append(custom_form)
     });
